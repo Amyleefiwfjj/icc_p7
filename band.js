@@ -17,7 +17,7 @@ let trail = []; // 브러쉬 궤적 저장
 function preload() {
   soundFormats('mp3', 'wav');
   instrumentSounds['bass'] = loadSound('./assets/bass.wav');
-  instrumentSounds['electric'] = loadSound('./assets/electric.mp3');
+  instrumentSounds['electric'] = loadSound('./assets/electric.wav');
   instrumentSounds['guitar'] = loadSound('./assets/guitar.wav');
   instrumentSounds['keyboard'] = loadSound('./assets/piano_sound.wav');
   instrumentSounds['drum_kick'] = loadSound('./assets/drum_kick.wav');
