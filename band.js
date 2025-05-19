@@ -2,8 +2,8 @@ let instruments = ['bass', 'electric', 'drums', 'guitar', 'keyboard'];
 let instrumentSounds = {};
 let recording = [];
 let isRecording = false;
-let isPlayingRandom = false;
 let recordButton;
+let soundFile;
 let brushcolor = [
   [240, 158, 158], [237, 183, 145], [237, 231, 145], [191, 245, 159],
   [158, 240, 202], [156, 230, 225], [163, 208, 240], [184, 163, 240]
@@ -28,6 +28,9 @@ function setup() {
   brushLayer = createGraphics(windowWidth - hudWidth, windowHeight);
   recordButton = select('#recordButton');
   background(255);
+  recorder = new p5.SoundRecorder();
+  recorder.setInput();
+  soundFile = new p5.SoundFile();
 }
 
 function draw() {
@@ -35,7 +38,7 @@ function draw() {
   image(brushLayer, hudWidth, 0);
   drawInstrumentGuide();
 
-  if (mouseIsPressed && !isPlayingRandom && mouseX > hudWidth) {
+  if (mouseIsPressed && mouseX > hudWidth) {
     let sectionHeight = height / instruments.length;
     let instrumentIndex = floor(mouseY / sectionHeight);
     instrumentIndex = constrain(instrumentIndex, 0, instruments.length - 1);
@@ -106,43 +109,30 @@ function playInstrument(instrument, pitch, volume) {
     sound.play();
   }
 }
-
+function homePage() {
+  window.location.href = "index.html";
+}
 function toggleRecording() {
   if (!isRecording) {
     recording = [];
     isRecording = true;
-    recordButton.html("Stop Recording");
-    console.log("🎙️ Recording started...");
+    recorder.record(soundFile); // 🔴 녹음 시작
+    console.log("Recording started...");
   } else {
     isRecording = false;
-    recordButton.html("Start Recording");
-    console.log("✅ Recording stopped. Stored notes:", recording);
+    recorder.stop(); // ⏹️ 녹음 중지
+    console.log("Recording stopped.");
+    saveRecording(); // 저장 호출
+  }
+}
+function saveRecording() {
+  if (soundFile) {
+    save(soundFile, 'your_recording.mp3');
+  } else {
+    console.error("No recording found. Make sure you have recorded something.");
   }
 }
 
-function randomMix() {
-  isPlayingRandom = true;
-  brushLayer.clear();
-  if (recording.length > 0) {
-    let shuffled = shuffle([...recording]);
-    for (let i = 0; i < shuffled.length; i++) {
-      setTimeout(() => {
-        let r = shuffled[i];
-        if (r.instrument.startsWith('drum')) {
-          playDrum(r.instrument, r.volume);
-        } else {
-          playInstrument(r.instrument, r.pitch, r.volume);
-        }
-        brushLayer.stroke(color(...brushcolor[floor(random(brushcolor.length))]));
-        brushLayer.strokeWeight(10);
-        brushLayer.point(r.x - hudWidth, r.y);
-        if (i === shuffled.length - 1) isPlayingRandom = false;
-      }, i * 150);
-    }
-  } else {
-    isPlayingRandom = false;
-  }
-}
 function resetAll() {
   background(255);
 }

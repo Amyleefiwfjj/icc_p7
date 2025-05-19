@@ -5,6 +5,7 @@ let isRecording = false;
 let recordButton;
 let trail = []; // 브러쉬 트레일 저장용
 const maxTrail = 30;
+let soundFile;
 let brushcolor = [[240, 158, 158], [237, 183, 145], [237, 231, 145], [191, 245, 159], [158, 240, 202], [156, 230, 225], [163, 208, 240], [184, 163, 240]];
 function preload() {
   soundFormats('mp3', 'wav');
@@ -17,6 +18,9 @@ function setup() {
   recordButton = select('#recordButton');
   prevColor = color(...brushcolor[0]);  // 초기 색상
   targetColor = color(...brushcolor[0]);
+  recorder = new p5.SoundRecorder();
+  recorder.setInput();
+  soundFile = new p5.SoundFile();
 }
 
 function draw() {
@@ -63,13 +67,23 @@ function toggleRecording() {
   if (!isRecording) {
     recording = [];
     isRecording = true;
+    recorder.record(soundFile); // 🔴 녹음 시작
     console.log("Recording started...");
   } else {
     isRecording = false;
-    recordButton.html("Start Recording");
-    console.log("Recording stopped. Stored notes:", recording);
+    recorder.stop(); // ⏹️ 녹음 중지
+    console.log("Recording stopped.");
+    saveRecording(); // 저장 호출
   }
 }
+function saveRecording() {
+  if (soundFile) {
+    save(soundFile, 'your_recording.mp3');
+  } else {
+    console.error("No recording found. Make sure you have recorded something.");
+  }
+}
+
 function resetAll() {
   background(255);
 }
@@ -100,4 +114,7 @@ function randomMix() {
     isPlayingRandom = false;
   }
 
+}
+function homePage() {
+  window.location.href = "index.html";
 }
