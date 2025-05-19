@@ -4,6 +4,7 @@ let recording = [];
 let isRecording = false;
 let recordButton;
 let soundFile;
+let recorder;
 let brushcolor = [
   [240, 158, 158], [237, 183, 145], [237, 231, 145], [191, 245, 159],
   [158, 240, 202], [156, 230, 225], [163, 208, 240], [184, 163, 240]
@@ -11,6 +12,7 @@ let brushcolor = [
 
 let brushLayer;
 let hudWidth = 160;
+let trail = []; // 브러쉬 궤적 저장
 
 function preload() {
   soundFormats('mp3', 'wav');
@@ -28,8 +30,9 @@ function setup() {
   brushLayer = createGraphics(windowWidth - hudWidth, windowHeight);
   recordButton = select('#recordButton');
   background(255);
+
+  // Recorder 설정
   recorder = new p5.SoundRecorder();
-  recorder.setInput();
   soundFile = new p5.SoundFile();
 }
 
@@ -37,6 +40,7 @@ function draw() {
   background(255);
   image(brushLayer, hudWidth, 0);
   drawInstrumentGuide();
+  playTrailNotes(); // 브러쉬 궤적의 음을 재생
 
   if (mouseIsPressed && mouseX > hudWidth) {
     let sectionHeight = height / instruments.length;
@@ -55,25 +59,41 @@ function draw() {
     brushLayer.stroke(colorVal);
     brushLayer.line(pmouseX - hudWidth, pmouseY, mouseX - hudWidth, mouseY);
 
-    if (instrument === 'drums') {
-      let drumType;
-      if (relativeX < (width - hudWidth) / 3) drumType = 'drum_kick';
-      else if (relativeX < 2 * (width - hudWidth) / 3) drumType = 'drum_snare';
-      else drumType = 'drum_hat';
+    // 🎵 궤적에 음 저장
+    trail.push({ x: mouseX, y: mouseY, instrument, volume, noteIndex });
 
-      playDrum(drumType, volume);
-      if (isRecording) {
-        recording.push({ instrument: drumType, volume, x: mouseX, y: mouseY, time: millis() });
-      }
-    } else {
-      let relativeY = mouseY % sectionHeight;
-      let pitch = map(relativeY, sectionHeight, 0, 0.5, 2.0);
-      playInstrument(instrument, pitch, volume);
-      if (isRecording) {
-        recording.push({ instrument, pitch, volume, x: mouseX, y: mouseY, time: millis() });
-      }
+    if (isRecording) {
+      recording.push({ instrument, volume, x: mouseX, y: mouseY, time: millis() });
     }
   }
+}
+
+// ✅ 브러쉬 궤적을 따라 음을 재생
+function playTrailNotes() {
+  if (trail.length > 0) {
+    for (let i = 0; i < trail.length; i++) {
+      let t = trail[i];
+      let instrument = t.instrument;
+      let volume = t.volume;
+      let noteIndex = t.noteIndex;
+
+      if (instrument === 'drums') {
+        let drumType = getDrumType(t.x - hudWidth);
+        playDrum(drumType, volume);
+      } else {
+        let pitch = map(t.y, 0, height, 0.5, 2.0); // y 좌표로 피치 결정
+        playInstrument(instrument, pitch, volume);
+      }
+    }
+    trail = []; // 🎵 한 번 재생 후 궤적 초기화
+  }
+}
+
+// ✅ 드럼 타입 결정
+function getDrumType(relativeX) {
+  if (relativeX < (width - hudWidth) / 3) return 'drum_kick';
+  else if (relativeX < 2 * (width - hudWidth) / 3) return 'drum_snare';
+  else return 'drum_hat';
 }
 
 function drawInstrumentGuide() {
@@ -95,7 +115,7 @@ function drawInstrumentGuide() {
 
 function playDrum(drumType, volume) {
   let sound = instrumentSounds[drumType];
-  if (sound && !sound.isPlaying()) {
+  if (sound) {
     sound.setVolume(volume);
     sound.play();
   }
@@ -103,28 +123,27 @@ function playDrum(drumType, volume) {
 
 function playInstrument(instrument, pitch, volume) {
   let sound = instrumentSounds[instrument];
-  if (sound && !sound.isPlaying()) {
+  if (sound) {
     sound.rate(pitch);
     sound.setVolume(volume);
     sound.play();
   }
 }
-function homePage() {
-  window.location.href = "index.html";
-}
+
 function toggleRecording() {
   if (!isRecording) {
     recording = [];
     isRecording = true;
-    recorder.record(soundFile); // 🔴 녹음 시작
+    soundFile = new p5.SoundFile();
     console.log("Recording started...");
   } else {
     isRecording = false;
-    recorder.stop(); // ⏹️ 녹음 중지
+    recorder.stop();
     console.log("Recording stopped.");
-    saveRecording(); // 저장 호출
+    saveRecording();
   }
 }
+
 function saveRecording() {
   if (soundFile) {
     save(soundFile, 'your_recording.mp3');
