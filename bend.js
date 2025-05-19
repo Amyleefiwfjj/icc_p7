@@ -143,3 +143,6 @@ function randomMix() {
     isPlayingRandom = false;
   }
 }
+function resetAll() {
+  background(255);
+}
