@@ -18,60 +18,53 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   background(255);
   recordButton = select('#recordButton');
-  prevColor = color(...brushcolor[0]);  // 초기 색상
-  targetColor = color(...brushcolor[0]);
+  prevColor = color(...brushcolor[0]);   targetColor = color(...brushcolor[0]);
   recorder = new p5.SoundRecorder();
   recorder.setInput();
   soundFile = new p5.SoundFile();
 }
-
 function draw() {
   if (mouseIsPressed) {
-    let noteIndex = floor(map(mouseX, 0, width, 0, notes.length));
-    noteIndex = constrain(noteIndex, 0, notes.length - 1);
-    let octaveIndex = floor(map(mouseY, 0, height, 0, numOctaves));
-    octaveIndex = constrain(octaveIndex, 0, numOctaves - 1);
-    let midiToPlay = notes[noteIndex] + octaveIndex * 12;
-    let volume = map(mouseY, height, 0, 0, 1);
-    volume = constrain(volume, 0, 1);
+    drawBrush();
+    playNoteFromMouse();
 
-    let size = map(mouseY, 0, height, 5, 50);
-    strokeWeight(size);
-
-    let colorIndex = (noteIndex + octaveIndex * notes.length) % brushcolor.length;
-    targetColor = color(...brushcolor[colorIndex]);
-    prevColor = lerpColor(prevColor, targetColor, 0.05);
-
-    stroke(prevColor);
-    line(pmouseX, pmouseY, mouseX, mouseY);
-
-    playNote(midiToPlay, volume);
-    trail.push({ note: midiToPlay, volume, x: mouseX, y: mouseY });
     if (isRecording) {
-      recording.push({ note: midiToPlay, volume, x: mouseX, y: mouseY, time: millis() });
+      recorder.record(soundFile);
     }
-    playTrailNotes();
   }
-}
-function playTrailNotes() {
-  if (trail.length > 0) {
-    for (let i = 0; i < trail.length; i++) {
-      let t = trail[i];
-      playNote(t.note, t.volume); // 여러 음 동시에 재생
-    }
-    trail = []; // 재생 후 초기화
-  }
-}
-function playNote(note, volume) {
-  let newSound = loadSound('./assets/piano_sound.wav', (sound) => {
-    sound.setVolume(volume);
-    sound.rate(midiToFreq(note) / midiToFreq(60)); // C4 기준
-    sound.play();
-  });
 }
 
-function midiToFreq(midi) {
-  return 440 * Math.pow(2, (midi - 69) / 12);
+function drawBrush() {
+  let dx = mouseX, dy = mouseY;
+  let noteIdx = floor(map(mouseX, 0, width, 0, notes.length));
+  let octaveIdx = floor(map(mouseY, 0, height, 0, numOctaves));
+  let colorIndex = (noteIdx + octaveIdx * notes.length) % brushcolor.length;
+  targetColor = color(...brushcolor[colorIndex]);
+  prevColor = lerpColor(prevColor, targetColor, 0.05);
+
+  let sw = map(mouseY, 0, height, 5, 50);
+  strokeWeight(sw);
+  stroke(prevColor);
+  line(pmouseX, pmouseY, mouseX, mouseY);
+}
+
+function playNoteFromMouse() {
+  let noteIndex = floor(map(mouseX, 0, width, 0, notes.length));
+  noteIndex = constrain(noteIndex, 0, notes.length - 1);
+  let octaveIndex = floor(map(mouseY, 0, height, 0, numOctaves));
+  octaveIndex = constrain(octaveIndex, 0, numOctaves - 1);
+  let midiToPlay = notes[noteIndex] + octaveIndex * 12;
+
+  let vol = map(mouseY, height, 0, 0, 1);
+  vol = constrain(vol, 0, 1);
+
+  // (3) rate 설정을 위해 내장 midiToFreq 호출
+  let baseFreq = p5.prototype.midiToFreq.call(this, 60);
+  let freq = p5.prototype.midiToFreq.call(this, midiToPlay);
+
+  piano.setVolume(vol);
+  piano.rate(freq / baseFreq);
+  piano.play();
 }
 
 function resetAll() {
@@ -103,28 +96,7 @@ function saveRecording() {
 function randomMix() {
   isPlayingRandom = true;
   background(255);
-
-  if (recording.length > 0) {
-    let shuffled = shuffle([...recording]);  // 순서만 섞기
-
-    for (let i = 0; i < shuffled.length; i++) {
-      setTimeout(() => {
-        let r = shuffled[i];
-        playNote(r.note, r.volume);
-
-        // 시각화
-        stroke(color(...brushcolor[getNoteIndexFromMidi(r.note)]));
-        strokeWeight(10);
-        point(r.x, r.y);  // 해당 위치에 점을 찍음
-
-        if (i === shuffled.length - 1) {
-          isPlayingRandom = false;
-        }
-      }, i * 100); // 🎵 빠르게 재생 (100ms 간격)
-    }
-  } else {
-    isPlayingRandom = false;
-  }
+  notes = shuffle(notes, true);
 }
 
 function getNoteIndexFromMidi(midi) {

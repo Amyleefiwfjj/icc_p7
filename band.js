@@ -9,6 +9,8 @@ let brushcolor = [
   [240, 158, 158], [237, 183, 145], [237, 231, 145], [191, 245, 159],
   [158, 240, 202], [156, 230, 225], [163, 208, 240], [184, 163, 240]
 ];
+let lastPlayTime = 0;
+const PLAY_INTERVAL = 100; // 0.1초마다 한 번만 재생
 
 let brushLayer;
 let hudWidth = 160;
@@ -24,10 +26,18 @@ function preload() {
   instrumentSounds['drum_snare'] = loadSound('./assets/drum_snare.wav');
   instrumentSounds['drum_hat'] = loadSound('./assets/drum_hat.wav');
 }
+// setup() 맨 위에 추가
+delete window.midiToFreq;
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
-  brushLayer = createGraphics(windowWidth - hudWidth, windowHeight);
+  const headerH = 60;                                 // 헤더 높이
+  const cnv = createCanvas(windowWidth, windowHeight - headerH);
+  cnv.parent('canvasContainer');
+
+  // HUD 너비를 뺀 영역만큼 brushLayer 생성
+  brushLayer = createGraphics(windowWidth - hudWidth, windowHeight - headerH);
+
+  // 이제 더 이상 전체 높이로 덮어쓰지 않습니다!
   recordButton = select('#recordButton');
   background(255);
 
@@ -59,7 +69,6 @@ function draw() {
     brushLayer.stroke(colorVal);
     brushLayer.line(pmouseX - hudWidth, pmouseY, mouseX - hudWidth, mouseY);
 
-    // 🎵 궤적에 음 저장
     trail.push({ x: mouseX, y: mouseY, instrument, volume, noteIndex });
 
     if (isRecording) {
@@ -68,28 +77,30 @@ function draw() {
   }
 }
 
-// ✅ 브러쉬 궤적을 따라 음을 재생
 function playTrailNotes() {
   if (trail.length > 0) {
-    for (let i = 0; i < trail.length; i++) {
+    const SAMPLE_RATE = 5;   // 5개당 1번만 재생
+
+    // trail[0], trail[5], trail[10], ... 만 처리
+    for (let i = 0; i < trail.length; i += SAMPLE_RATE) {
       let t = trail[i];
       let instrument = t.instrument;
       let volume = t.volume;
-      let noteIndex = t.noteIndex;
 
       if (instrument === 'drums') {
         let drumType = getDrumType(t.x - hudWidth);
         playDrum(drumType, volume);
       } else {
-        let pitch = map(t.y, 0, height, 0.5, 2.0); // y 좌표로 피치 결정
+        let pitch = map(t.y, 0, height, 0.5, 2.0);
         playInstrument(instrument, pitch, volume);
       }
     }
-    trail = []; // 🎵 한 번 재생 후 궤적 초기화
+
+    // 사용한 후에는 비워 줍니다
+    trail = [];
   }
 }
 
-// ✅ 드럼 타입 결정
 function getDrumType(relativeX) {
   if (relativeX < (width - hudWidth) / 3) return 'drum_kick';
   else if (relativeX < 2 * (width - hudWidth) / 3) return 'drum_snare';
@@ -154,4 +165,7 @@ function saveRecording() {
 
 function resetAll() {
   background(255);
+}
+function homePage() {
+  window.location.href = "index.html";
 }

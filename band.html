@@ -1,61 +1,85 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 
 <head>
-  <title>Brush Band Instrument</title>
+  <meta charset="UTF-8" />
+  <title>Play the bend</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
   <style>
     body {
       margin: 0;
+      padding-top: 80px;
       overflow: hidden;
       font-family: 'Courier New', monospace;
       background: #111;
-      color: white;
+      color: #fff;
+    }
+
+    header {
+      position: absolute;
+      top: 0px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      z-index: 1000;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
     }
 
     #controls {
-      position: absolute;
-      top: 20px;
-      left: 20px;
       display: flex;
       gap: 10px;
-      z-index: 1000;
     }
 
     button {
       background: linear-gradient(135deg, #f06, #a0f);
       border: none;
-      padding: 12px 20px;
+      padding: 5px 9px;
       font-size: 14px;
       font-weight: bold;
-      color: white;
-      border-radius: 12px;
+      color: #fff;
+      border-radius: 10px;
       cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-      transition: all 0.2s ease-in-out;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
     }
 
     button:hover {
       transform: scale(1.05);
-      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    #canvasContainer {
+      position: absolute;
+      top: 80px;
+      left: 0;
+      right: 0;
+      bottom: 0;
     }
   </style>
 </head>
 
 <body>
 
-  <div id="controls">
-    <button id="recordButton" onclick="toggleRecording()">Start Recording</button>
-    <button onclick="resetAll()">Redraw</button>
-    <button onclick="homePage()">시작화면으로 가기</button>
+  <header>
+    <h1>Just draw to make a music</h1>
+    <div id="controls">
+      <button id="recordButton" onclick="toggleRecording()">Start Recording</button>
+      <button onclick="resetAll()">Redraw</button>
+      <button onclick="homePage()">시작화면으로 가기</button>
+    </div>
+  </header>
 
-  </div>
-
-  <script src='./band.js'>
-
-  </script>
-
+  <main id="canvasContainer"></main>
+  <script src="./band.js"></script>
 </body>
 
 </html>

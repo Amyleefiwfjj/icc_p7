@@ -1,19 +1,85 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 
 <head>
-    <title>Make your own music just by drawing!</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Make Your Own Music</title>
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
+    <!-- p5.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-    <style></style>
+    <style>
+        :root {
+            --bg-gradient-1: #141e30;
+            --bg-gradient-2: #243b55;
+            --accent-gradient: linear-gradient(135deg, #29ffb9, #20c997);
+            --font-family: 'Rubik', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to right, var(--bg-gradient-1), var(--bg-gradient-2));
+            font-family: var(--font-family);
+            color: #fff;
+        }
+
+        .container {
+            text-align: center;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            max-width: 90%;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        button {
+            background: linear-gradient(135deg, #f06, #a0f);
+            border: none;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s ease-in-out;
+        }
+
+
+           button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+        }
+    </style>
 </head>
 
 <body>
-    <div id="controls">
-        <button onClick=pianoPage()>피아노치러 가기</button>
-        <button onClick=bandPage()>밴드 연주하러 가기</button>
-
+    <div class="container">
+        <h1>Make Your Own Music</h1>
+        <div class="buttons">
+            <button type="button" onclick="pianoPage()">피아노 치러 가기</button>
+            <button type="button" onclick="bandPage()">밴드 연주하러 가기</button>
+        </div>
     </div>
-    <script src='./index.js'></script>
+
+    <script src="./index.js"></script>
 </body>
 
 </html>

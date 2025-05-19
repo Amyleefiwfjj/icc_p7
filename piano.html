@@ -2,10 +2,29 @@
 <html>
 
 <head>
-  <title>Brush Instrument with p5.js</title>
+  <title>Play with piano</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
   <style>
+    header {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      /* 제목–버튼 사이 여백 */
+      z-index: 1000;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.2rem;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+    }
+
     body {
       margin: 0;
       overflow: hidden;
@@ -15,12 +34,8 @@
     }
 
     #controls {
-      position: absolute;
-      top: 20px;
-      left: 20px;
       display: flex;
-      gap: 10px;
-      z-index: 1000;
+      gap: 12px;
     }
 
     button {
@@ -45,13 +60,16 @@
 
 <body>
 
-  <div id="controls">
-    <button id="recordButton" onclick="toggleRecording()">Start Recording</button>
-    <button onclick="randomMix()">Random Mix</button>
-    <button onclick="resetAll()">Redraw</button>
-    <button onclick="homePage()">시작화면으로 가기</button>
+  <header>
+    <h1>Just draw to make a music</h1>
+    <div id="controls">
+      <button id="recordButton" onclick="toggleRecording()">Start Recording</button>
+      <button onclick="randomMix()">Random Mix</button>
+      <button onclick="resetAll()">Redraw</button>
+      <button onclick="homePage()">시작화면으로 가기</button>
 
-  </div>
+    </div>
+  </header>
 
   <script src='./piano.js'>
   </script>
