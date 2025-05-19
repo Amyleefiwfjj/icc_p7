@@ -1,11 +1,19 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Brush Instrument with p5.js</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
   <style>
-    body { margin: 0; overflow: hidden; font-family: 'Courier New', monospace; background: #111; color: white; }
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: 'Courier New', monospace;
+      background: #111;
+      color: white;
+    }
+
     #controls {
       position: absolute;
       top: 20px;
@@ -14,6 +22,7 @@
       gap: 10px;
       z-index: 1000;
     }
+
     button {
       background: linear-gradient(135deg, #f06, #a0f);
       border: none;
@@ -26,21 +35,25 @@
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
       transition: all 0.2s ease-in-out;
     }
+
     button:hover {
       transform: scale(1.05);
       box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
     }
   </style>
 </head>
+
 <body>
 
-<div id="controls">
-  <button id="recordButton" onclick="toggleRecording()">Start Recording</button>
-  <button onclick="randomMix()">Random Mix</button>
-</div>
+  <div id="controls">
+    <button id="recordButton" onclick="toggleRecording()">Start Recording</button>
+    <button onclick="randomMix()">Random Mix</button>
+    <button onclick="resetAll()">Redraw</button>
+  </div>
 
-<script src = './piano.js'>
-</script>
+  <script src='./piano.js'>
+  </script>
 
 </body>
+
 </html>
